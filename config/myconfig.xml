@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<configuration>
+    <gui pkg="randomwalk" delay="1" pixels_per_meter="450" />
+    <arena
+        pkg="randomwalk"
+        timestep_length="0.1"
+        size="1.6,1.6"
+        size_radius= "0.7506"
+        max_steps="100000"
+        num_agents="150"
+        num_runs="100"
+        results="result_test.dat"
+        decision_quorum="0.85"
+        >
+      <target id="A" value="1.5" size="0.03045" color="green" distance="0.76" />
+      <target id="B" value="1.5" size="0.03045" color="purple" distance="0.76" />
+      <agent pkg="randomwalk"
+             linear_speed="0.013"
+             CRW_exponent="0.5"
+             average_motion_steps="0"
+             std_motion_steps="5"
+             levy_exponent="2.0"
+             interaction_range="0.1"
+             bias_probability ="0.1" />
+   	</arena>
+</configuration>
