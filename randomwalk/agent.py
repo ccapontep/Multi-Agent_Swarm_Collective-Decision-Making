@@ -212,8 +212,8 @@ class CRWLEVYAgent(pysage.Agent):
             if neighbours:
                 selected_neighbour = random.choice(neighbours)
                 if selected_neighbour.target_committed != self.target_committed:
-                    # prob_crossinhibition = selected_neighbour.target_value * self.arena.timestep_length #selected_neighbour.target_value
-                    prob_crossinhibition = 0.3 * self.arena.timestep_length #selected_neighbour.target_value
+                    prob_crossinhibition = selected_neighbour.target_value * self.arena.timestep_length #selected_neighbour.target_value
+                    # prob_crossinhibition = 0.3 * self.arena.timestep_length #selected_neighbour.target_value
 
             if prob_abandonment + prob_crossinhibition > 1:
                 print "[ERROR] Probabilities go over maximimum value"
