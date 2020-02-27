@@ -773,7 +773,7 @@ class AgentFactory:
 class Agent:
     'Definition of an agent in 2D space'
     num_agents = 0
-    size       = 0.01
+    size       = 0.033
     mass       = 0.01
     arena      = None
 
@@ -1293,7 +1293,7 @@ def start(argv):
 
     gui_config = tree.getroot().find('gui')
     if gui_config is None:
-#    if gui_config is not None: original file - used for GUI
+    # if gui_config is not None: #original file - used for GUI
         global tk
         import Tkinter as tk
         print 'Graphical user interface is on'

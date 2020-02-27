@@ -33,6 +33,8 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
 
         self.timestep_length = 0.5 if config_element.attrib.get("timestep_length") is None else float(config_element.attrib.get("timestep_length"))
 
+        self.time_scale = 0.008 if config_element.attrib.get("time_scale") is None else float(config_element.attrib.get("time_scale"))
+
         self.size_radius = 0.7506 if config_element.attrib.get("size_radius") is None else float(config_element.attrib.get("size_radius"))
 
 
@@ -51,7 +53,7 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
             new_target = Target(target_element)
             self.targets.append(new_target)
             self.num_targets += 1
-            print "Initalised target", new_target.id, "(value:", new_target.value, ")"
+            print "Initalised target", new_target.id, "(quality value:", new_target.value, ")"
 
 
         # initialise num runs from the configuration file
@@ -82,28 +84,36 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
             on_target = True
 
             # Get the location of the first target random and inside circle area environment
+            # half the target distance
             while on_target:
                 if i == 0:
-                    max_size = (self.dimensions_radius - target.size)
+                    # max_size = (self.dimensions_radius - target.size)
+                    max_size = target.distance /2
+                    # print max_size
                     while True:
-                        rand1 = random.uniform(-max_size, max_size)
-                        rand2 = random.uniform(-max_size, max_size)
-                        d1 = math.sqrt((rand1 - 0)**2 + (rand2 - 0)**2)
-                        if d1 < max_size:
-                            target.position = pysage.Vec2d(rand1,rand2)
+                        x1 = random.uniform(-max_size, max_size)
+                        # rand2 = random.uniform(-max_size, max_size)
+                        # d1 = math.sqrt((rand1 - 0)**2 + (rand2 - 0)**2)
+                        negpos = random.choice((-1, 1))
+                        y1 = math.sqrt(max_size**2 - x1**2) * negpos
+                        if math.sqrt(x1**2 + y1**2) == max_size:
+                            target.position = pysage.Vec2d(x1,y1)
                             print"Target id", i, "is at position", target.position
                             break
 
             # Get the location of the second target random, but set length away
             # from first target and inside circle area environment
                 else:
+                    # target.position = pysage.Vec2d(0,0)
                     while True:
                         targetA_pos = self.targets[0].position
-                        angle = random.uniform(0,360)
-                        x = (target.distance * math.cos(angle)) + targetA_pos[0]
-                        y = (target.distance * math.sin(angle)) + targetA_pos[1]
+                        # angle = random.uniform(0,360)
+                        x = targetA_pos[0] * -1
+                        y = targetA_pos[1] * -1
+                        # x = (target.distance * math.cos(angle)) + targetA_pos[0]
+                        # y = (target.distance * math.sin(angle)) + targetA_pos[1]
                         d2 = math.sqrt((x - 0)**2 + (y - 0)**2)
-                        if d2 < max_size:
+                        if d2 < max_size * 2:
                             target.position = pysage.Vec2d(x,y)
                             print"Target id", i, "is at position", target.position
                             break
@@ -119,9 +129,16 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
         for agent in self.agents:
             on_target = True
             while on_target:
-                max_size = (self.dimensions_radius - agent.size)
-                agent.position = pysage.Vec2d(random.uniform(0,max_size),0)
-                agent.position.rotate(random.uniform(-math.pi,math.pi))
+                max_sizeA = (self.dimensions_radius - agent.size)
+                while True:
+                    Arand1 = random.uniform(-max_sizeA, max_sizeA)
+                    Arand2 = random.uniform(-max_sizeA, max_sizeA)
+                    d1 = math.sqrt((Arand1 - 0)**2 + (Arand2 - 0)**2)
+                    if d1 < max_sizeA:
+                        agent.position = pysage.Vec2d(Arand1,Arand2)
+                        # agent.position.rotate(random.uniform(-math.pi,math.pi))
+                        break
+                # agent.position = pysage.Vec2d(random.uniform(0,max_size),0)
                 on_target= False
                 for t in self.targets:
                     if (t.position - agent.position).get_length() < t.size:
@@ -154,6 +171,7 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
         # computes the desired motion and agent state
         for a in self.agents:
             a.control()
+            # if a.step_neighbours: print 'confirmed saved correctly'
 
         # apply the desired motion
         for a in self.agents:
@@ -216,6 +234,7 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
         for a in self.agents:
             if (a is not agent) and ((a.position - agent.position).get_length() < distance_range):
                 neighbour_list.append(a)
+                # print(neighbour_list)
         return neighbour_list
 
 
