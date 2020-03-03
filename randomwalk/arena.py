@@ -37,6 +37,8 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
 
         self.size_radius = 0.7506 if config_element.attrib.get("size_radius") is None else float(config_element.attrib.get("size_radius"))
 
+        self.steps_run = int(config_element.attrib["steps_run"])
+        self.time_incr = int(config_element.attrib["time_incr"])
 
         # is the experiment finished?
         self.has_converged = False
@@ -152,17 +154,19 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
     ##########################################################################
     # run experiment until finished
     def run_experiment( self ):
-        results_filename = os.path.join(directory, "results", "QltyValue_" + str(self.targets[0].value) + '_targetDis_' + str(self.targets[0].distance) + '_CRW_' + str(CRWLEVYAgent.CRW_exponent) +  '.txt')
+        results_filename = os.path.join(directory, "results", "QltyValue_" + str(self.targets[0].value) + '_targetDis_' + str(self.targets[0].distance) + '_CRW_' + str(CRWLEVYAgent.CRW_exponent) + '_levy_' + str(CRWLEVYAgent.levy_exponent) +  '.txt')
 
         while not self.experiment_finished():
             minute = self.num_steps/60
-            if self.num_steps % (5*60) == 0 : # store values every 5 minutes
-                self.save_num += 1
+            if self.num_steps % (self.time_incr*60) == 0 : # store values every time_incrrement (2,5, or etc) minutes
+                self.save_num += 1 # amount of times data is saved to control all runs have same qty
                 print'Running for', minute, 'minutes..'
                 commitment_state = self.get_commitment_state()
                 self.results.store(self.has_converged, self.num_steps, commitment_state, False)
                 self.results.save(results_filename, self.save_num)
             self.update()
+        # if self.save_num == self.steps_run -1:
+        #     self.experiment_finished()
 
     ##########################################################################
     # updates the status of the simulation
@@ -242,17 +246,30 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
     # check if the experiment si finished
     ##########################################################################
     def experiment_finished( self ):
-        results_filename = os.path.join(directory, "results", "QltyValue_" + str(self.targets[0].value) + '_targetDis_' + str(self.targets[0].distance) + '_CRW_' + str(CRWLEVYAgent.CRW_exponent) +  '.txt')
+        results_filename = os.path.join(directory, "results", "QltyValue_" + str(self.targets[0].value) + '_targetDis_' + str(self.targets[0].distance) + '_CRW_' + str(CRWLEVYAgent.CRW_exponent) + '_levy_' + str(CRWLEVYAgent.levy_exponent) +  '.txt')
 
-        conv_time = 0.0
-        if ((self.max_steps > 0) and (self.max_steps <= self.num_steps) or self.has_converged):
-            conv_time =  self.convergence_time
+
+        # conv_time = 0.0
+
+        if ((self.max_steps > 0) and (self.max_steps <= self.num_steps) or self.has_converged or self.save_num == self.steps_run):
+            # conv_time =  self.convergence_time
             print "Run finished: ", self.has_converged, "\tTotal seconds:", self.convergence_time
 
             commitment_state = self.get_commitment_state()
+            # self.results.store(self.has_converged, self.convergence_time, commitment_state, True)
 
-            self.results.store(self.has_converged, self.convergence_time, commitment_state, True)
+            while self.save_num != self.steps_run and self.save_num < self.steps_run:
+                self.save_num += 1
+                fake_time = (self.save_num -1) * self.time_incr * 60
+                self.results.store(self.has_converged, fake_time, commitment_state, False)
+                self.results.save(results_filename, self.save_num)
+
+
+            self.save_num += 1
+            fake_time = (self.save_num-1) * self.time_incr * 60
+            self.results.store(self.has_converged, fake_time, commitment_state, True)
             self.results.save(results_filename, self.save_num)
+            self.save_num = 0 # reset counter
             return True
         return False
 

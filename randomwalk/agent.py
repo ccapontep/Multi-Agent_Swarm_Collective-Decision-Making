@@ -191,12 +191,9 @@ class CRWLEVYAgent(pysage.Agent):
                 # if neighbor info was saved previously, also recruit
                 elif self.step_neighbours:
                     selected_neighbour = random.choice(self.step_neighbours)
-                    # selected_neighbour = self.step_neighbours
-                    # print 'using saved neighbors'
                 recruitment_value  = selected_neighbour.target_value * TimeScaling
                 recruitment_target = selected_neighbour.target_committed
                 recruitment_color  = selected_neighbour.target_color
-                # print recruitment_color
 
 
             if discovery_value + recruitment_value > 1:
@@ -246,8 +243,8 @@ class CRWLEVYAgent(pysage.Agent):
                     selected_neighbour = random.choice(self.step_neighbours)
 
                 if selected_neighbour.target_committed != self.target_committed:
-                    # prob_crossinhibition = selected_neighbour.target_value * TimeScaling #selected_neighbour.target_value
-                    prob_crossinhibition = 0.9 * TimeScaling #selected_neighbour.target_value
+                    prob_crossinhibition = selected_neighbour.target_value * TimeScaling #selected_neighbour.target_value
+                    # prob_crossinhibition = 0.8 * TimeScaling #selected_neighbour.target_value
 
 
             if prob_abandonment + prob_crossinhibition > 1:

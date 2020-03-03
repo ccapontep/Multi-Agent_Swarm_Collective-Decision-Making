@@ -940,6 +940,10 @@ class Arena:
         self.num_steps = 0
         self.max_steps = 0 if config_element.attrib.get("max_steps") is None else int(config_element.attrib["max_steps"])
 
+        # self.steps_run = int(config_element.attrib["steps_run"])
+        # self.save_num = self.save_num
+
+
         # length of a simulation step (in seconds)
         self.timestep_length = 0.1 if config_element.attrib.get("timestep_length") is None else float(config_element.attrib["timestep_length"])
 
@@ -1020,7 +1024,8 @@ class Arena:
 
     ##########################################################################
     # determines if an exeperiment is finished
-    def experiment_finished( self ):
+    def experiment_finished( self):
+
         return (self.max_steps > 0) and (self.max_steps <= self.num_steps)
 
 

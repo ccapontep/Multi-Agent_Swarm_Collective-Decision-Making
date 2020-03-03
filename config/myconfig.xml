@@ -10,18 +10,20 @@
         max_steps="100000"
         num_agents="150"
         num_runs="100"
+        steps_run="20"
+        time_incr='2'
         results="result_test.dat"
-        decision_quorum="0.85"
+        decision_quorum="0.70"
         >
       <target id="A" value="5" size="0.136" color="green" distance="0.76" />
       <target id="B" value="5" size="0.136" color="purple" distance="0.76" />
       <agent pkg="randomwalk"
              size='0.033'
              linear_speed="0.01"
-             CRW_exponent="0.5"
+             CRW_exponent="0.1"
              average_motion_steps="0"
              std_motion_steps="100"
-             levy_exponent="2.0"
+             levy_exponent="2"
              interaction_range="0.1"
              bias_probability ="0.1" />
    	</arena>
