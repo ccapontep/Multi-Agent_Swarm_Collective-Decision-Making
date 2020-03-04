@@ -38,7 +38,7 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
         self.size_radius = 0.7506 if config_element.attrib.get("size_radius") is None else float(config_element.attrib.get("size_radius"))
 
         self.steps_run = int(config_element.attrib["steps_run"])
-        self.time_incr = int(config_element.attrib["time_incr"])
+        self.time_incr = float(config_element.attrib["time_incr"])
 
         # is the experiment finished?
         self.has_converged = False
@@ -174,7 +174,7 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
     def update( self ):
         # computes the desired motion and agent state
         for a in self.agents:
-            a.control()
+            a.control(self.num_steps)
             # if a.step_neighbours: print 'confirmed saved correctly'
 
         # apply the desired motion

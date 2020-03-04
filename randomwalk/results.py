@@ -45,7 +45,7 @@ class Results:
 
         print(all_data)
 
-        head = 'Run Number  |  Time to Converge  |  Agents Commited to Chosen / Other / Uncommitted Target\n'
+        head = 'Run Number  |  Time to Converge  |  Agents Commited to First / Second / Uncommitted Target\n'
         with open(data_filename, "a+") as f:
             if self.start == True:
                 f.write(head)

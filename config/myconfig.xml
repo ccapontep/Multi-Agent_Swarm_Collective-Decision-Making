@@ -11,7 +11,7 @@
         num_agents="150"
         num_runs="100"
         steps_run="20"
-        time_incr='2'
+        time_incr='1.7'
         results="result_test.dat"
         decision_quorum="0.70"
         >
@@ -20,7 +20,7 @@
       <agent pkg="randomwalk"
              size='0.033'
              linear_speed="0.01"
-             CRW_exponent="0.1"
+             CRW_exponent="0.6"
              average_motion_steps="0"
              std_motion_steps="100"
              levy_exponent="2"

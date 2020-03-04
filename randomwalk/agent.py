@@ -143,7 +143,7 @@ class CRWLEVYAgent(pysage.Agent):
     ##########################################################################
     # compute the desired motion as a random walk
     ##########################################################################
-    def control(self):
+    def control(self, num_steps):
 
         # first check if the agent is passing over any target
         if self.on_target and self.current_target is not None:
@@ -161,103 +161,114 @@ class CRWLEVYAgent(pysage.Agent):
                     # self.color = t.color
                     break
 
-        # calculate time scaling from robot to macro
-        TimeScaling = self.arena.timestep_length * CRWLEVYAgent.std_motion_steps * self.arena.time_scale
+        # check all neighbors every time step to save their info for later processing
+        step_neighbours = self.arena.get_neighbour_agents(self, CRWLEVYAgent.interaction_range)
+        # if any neighbors available, save to the agent data
+        if step_neighbours and self.decision_made == False:
+            self.step_neighbours = step_neighbours
+            # print 'saved neighbors'
 
-        # decision making
-        if self.target_committed is None:
-            # Discovery
-            discovery_value = 0
-            discovery_target = None
-            discovery_color = "black"
-            if self.on_target:
-                # area_disc = self.current_target.size**2 * math.pi
-                # area_env = 1
-                # prob_disc = area_disc / area_env
-                # discovery_value  = self.current_target.value * prob_disc * TimeScaling
-                discovery_value  = self.current_target.value * TimeScaling
-                discovery_target = self.current_target.id
-                discovery_color  = self.current_target.color
+        # make a decision every N time steps
+        if num_steps % CRWLEVYAgent.std_motion_steps == 0:
+            # calculate time scaling from robot to macro
+            TimeScaling = self.arena.timestep_length * self.arena.time_scale
 
-
-            # Recruitment
-            recruitment_value = 0
-            recruitment_target = None
-            recruitment_color = "black"
-            neighbours = self.arena.get_neighbour_agents(self, CRWLEVYAgent.interaction_range)
-            if neighbours or self.step_neighbours:
-                if neighbours:
-                    selected_neighbour = random.choice(neighbours)
-                # if neighbor info was saved previously, also recruit
-                elif self.step_neighbours:
-                    selected_neighbour = random.choice(self.step_neighbours)
-                recruitment_value  = selected_neighbour.target_value * TimeScaling
-                recruitment_target = selected_neighbour.target_committed
-                recruitment_color  = selected_neighbour.target_color
+            # decision making
+            if self.target_committed is None:
+                # Discovery
+                discovery_value = 0
+                discovery_target = None
+                discovery_color = "black"
+                if self.on_target:
+                    # area_disc = self.current_target.size**2 * math.pi
+                    # area_env = 1
+                    # prob_disc = area_disc / area_env
+                    # discovery_value  = self.current_target.value * prob_disc * TimeScaling
+                    discovery_value  = self.current_target.value * TimeScaling
+                    discovery_target = self.current_target.id
+                    discovery_color  = self.current_target.color
 
 
-            if discovery_value + recruitment_value > 1:
-                print "[ERROR] Probabilities go over maximimum value"
-                sys.exit(2)
-
-            rand_number = random.uniform(0,1)
-            if rand_number < discovery_value:
-                self.target_committed = discovery_target
-                self.target_value     = discovery_value/TimeScaling
-                self.target_color     = discovery_color
-                self.arena.update_target_commitment( discovery_target, 1 )
-                self.decision_made = True
-                # save info about decision for every neighbor agent
-                # for agent_neigh in neighbours:
-                #     agent_neigh.step_neighbours = self
-                    # print agent_neigh.step_neighbours.target_color
-                # erase info about neighboring decision once a decision is made
-                self.step_neighbours = None
-            elif rand_number < discovery_value + recruitment_value:
-                self.target_committed = recruitment_target
-                self.target_value     = recruitment_value/TimeScaling
-                self.target_color     = recruitment_color
-                # self.step_neighbours  = [] # reset list of neighbors after decision
-                self.arena.update_target_commitment( recruitment_target, 1 );
-                self.decision_made = True
-                # save info about decision for every neighbor agent
-                # for agent_neigh in neighbours:
-                #     agent_neigh.step_neighbours = self
-                    # print agent_neigh.step_neighbours.target_color
-                # erase info about neighboring decision once a decision is made
-                self.step_neighbours = None
-            else: self.decision_made = False
-
-        else:
-            # Abandonment
-            prob_abandonment = 1/ self.target_value * TimeScaling #0.5; #1.0 - self.current_target.value
-
-            # Cross-Inhibition
-            neighbours = self.arena.get_neighbour_agents(self, CRWLEVYAgent.interaction_range)
-            prob_crossinhibition = 0
-            if neighbours or self.step_neighbours:
-                if neighbours:
-                    selected_neighbour = random.choice(neighbours)
-                # if neighbor info was saved previously, also do cross-inhibition
-                elif self.step_neighbours:
-                    selected_neighbour = random.choice(self.step_neighbours)
-
-                if selected_neighbour.target_committed != self.target_committed:
-                    prob_crossinhibition = selected_neighbour.target_value * TimeScaling #selected_neighbour.target_value
-                    # prob_crossinhibition = 0.8 * TimeScaling #selected_neighbour.target_value
+                # Recruitment
+                recruitment_value = 0
+                recruitment_target = None
+                recruitment_color = "black"
+                neighbours = self.arena.get_neighbour_agents(self, CRWLEVYAgent.interaction_range)
+                if neighbours or self.step_neighbours:
+                    if neighbours:
+                        # print 'Neighbors found'
+                        selected_neighbour = random.choice(neighbours)
+                    # if neighbor info was saved previously, also recruit
+                    elif self.step_neighbours:
+                        # print 'Neighbors saved previously'
+                        selected_neighbour = random.choice(self.step_neighbours)
+                    recruitment_value  = selected_neighbour.target_value * TimeScaling
+                    recruitment_target = selected_neighbour.target_committed
+                    recruitment_color  = selected_neighbour.target_color
 
 
-            if prob_abandonment + prob_crossinhibition > 1:
-                print "[ERROR] Probabilities go over maximimum value"
-                sys.exit(2)
+                if discovery_value + recruitment_value > 1:
+                    print "[ERROR] Probabilities go over maximimum value"
+                    sys.exit(2)
 
-            if random.uniform(0,1) < prob_abandonment + prob_crossinhibition:
-                self.arena.update_target_commitment( self.target_committed, -1 );
-                self.target_committed = None
-                self.target_value     = 0
-                # self.step_neighbours  = [] # reset list of neighbors when decision made
-                self.target_color     = "black"
-                self.decision_made = False
+                rand_number = random.uniform(0,1)
+                if rand_number < discovery_value:
+                    self.target_committed = discovery_target
+                    self.target_value     = discovery_value/TimeScaling
+                    self.target_color     = discovery_color
+                    self.arena.update_target_commitment( discovery_target, 1 )
+                    self.decision_made = True
+                    # save info about decision for every neighbor agent
+                    # for agent_neigh in neighbours:
+                    #     agent_neigh.step_neighbours = self
+                        # print agent_neigh.step_neighbours.target_color
+                    # erase info about neighboring decision once a decision is made
+                    self.step_neighbours = None
+                elif rand_number < discovery_value + recruitment_value:
+                    self.target_committed = recruitment_target
+                    self.target_value     = recruitment_value/TimeScaling
+                    self.target_color     = recruitment_color
+                    # self.step_neighbours  = [] # reset list of neighbors after decision
+                    self.arena.update_target_commitment( recruitment_target, 1 );
+                    self.decision_made = True
+                    # save info about decision for every neighbor agent
+                    # for agent_neigh in neighbours:
+                    #     agent_neigh.step_neighbours = self
+                        # print agent_neigh.step_neighbours.target_color
+                    # erase info about neighboring decision once a decision is made
+                    self.step_neighbours = None
+                else: self.decision_made = False
+
+            else:
+                # Abandonment
+                prob_abandonment = 1/ self.target_value * TimeScaling #0.5; #1.0 - self.current_target.value
+
+                # Cross-Inhibition
+                neighbours = self.arena.get_neighbour_agents(self, CRWLEVYAgent.interaction_range)
+                prob_crossinhibition = 0
+                if neighbours or self.step_neighbours:
+                    if neighbours:
+                        selected_neighbour = random.choice(neighbours)
+                    # if neighbor info was saved previously, also do cross-inhibition
+                    elif self.step_neighbours:
+                        selected_neighbour = random.choice(self.step_neighbours)
+
+                    if selected_neighbour.target_committed != self.target_committed:
+                        prob_crossinhibition = selected_neighbour.target_value * TimeScaling #selected_neighbour.target_value
+                        # prob_crossinhibition = 0.8 * TimeScaling #selected_neighbour.target_value
+
+
+                if prob_abandonment + prob_crossinhibition > 1:
+                    print "[ERROR] Probabilities go over maximimum value"
+                    sys.exit(2)
+
+                if random.uniform(0,1) < prob_abandonment + prob_crossinhibition:
+                    self.arena.update_target_commitment( self.target_committed, -1 );
+                    self.target_committed = None
+                    self.target_value     = 0
+                    # self.step_neighbours  = [] # reset list of neighbors when decision made
+                    self.target_color     = "black"
+                    self.decision_made = True
 
 
 
@@ -281,13 +292,6 @@ class CRWLEVYAgent(pysage.Agent):
             self.apply_velocity.rotate(crw_angle)
 
 
-
-        # check all neighbors every time step to save their info for later processing
-        step_neighbours = self.arena.get_neighbour_agents(self, CRWLEVYAgent.interaction_range)
-        # if any neighbors available, save to the agent data
-        if step_neighbours and self.decision_made == False:
-            self.step_neighbours = step_neighbours
-            # print 'saved neighbors'
 
 
 pysage.AgentFactory.add_factory("randomwalk.agent", CRWLEVYAgent.Factory())
