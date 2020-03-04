@@ -134,11 +134,12 @@ class CRWLEVYAgent(pysage.Agent):
 
         # data for colletive decision making
         self.step_neighbours = []
+        self.step_target = None
         self.target_committed = None
         self.target_value = 0
         self.target_color = "black"
         self.next_committed_state = None
-        self.decision_made = False # save info if decision made by agent
+        self.decision_made_Neigh = False # save info if decision made by agent
 
     ##########################################################################
     # compute the desired motion as a random walk
@@ -157,21 +158,14 @@ class CRWLEVYAgent(pysage.Agent):
                 if (t.position - self.position).get_length() < t.size:
                     self.on_target = True
                     self.current_target = t
-
                     # self.color = t.color
                     break
 
-        # check all neighbors every time step to save their info for later processing
-        step_neighbours = self.arena.get_neighbour_agents(self, CRWLEVYAgent.interaction_range)
-        # if any neighbors available, save to the agent data
-        if step_neighbours and self.decision_made == False:
-            self.step_neighbours = step_neighbours
-            # print 'saved neighbors'
 
         # make a decision every N time steps
-        if num_steps % CRWLEVYAgent.std_motion_steps == 0:
+        if num_steps % self.arena.decision_step == 0:
             # calculate time scaling from robot to macro
-            TimeScaling = self.arena.timestep_length * self.arena.time_scale
+            TimeScaling = self.arena.timestep_length * self.arena.time_scale * self.arena.decision_step
 
             # decision making
             if self.target_committed is None:
@@ -179,7 +173,13 @@ class CRWLEVYAgent(pysage.Agent):
                 discovery_value = 0
                 discovery_target = None
                 discovery_color = "black"
-                if self.on_target:
+                if self.on_target or self.step_target:
+                    # if there is no current target, but has one target previously
+                    # visited then use this as the current target
+                    if self.step_target:
+                        self.current_target = self.step_target
+                        # print 'Target saved with color ', self.current_target.color
+                        # self.step_target = None # reset info
                     # area_disc = self.current_target.size**2 * math.pi
                     # area_env = 1
                     # prob_disc = area_disc / area_env
@@ -202,42 +202,47 @@ class CRWLEVYAgent(pysage.Agent):
                     elif self.step_neighbours:
                         # print 'Neighbors saved previously'
                         selected_neighbour = random.choice(self.step_neighbours)
+                        # print selected_neighbour.target_color
                     recruitment_value  = selected_neighbour.target_value * TimeScaling
                     recruitment_target = selected_neighbour.target_committed
                     recruitment_color  = selected_neighbour.target_color
+
 
 
                 if discovery_value + recruitment_value > 1:
                     print "[ERROR] Probabilities go over maximimum value"
                     sys.exit(2)
 
+                self.decision_made_Neigh = False
+                self.decision_made_Targ = False
                 rand_number = random.uniform(0,1)
                 if rand_number < discovery_value:
                     self.target_committed = discovery_target
                     self.target_value     = discovery_value/TimeScaling
                     self.target_color     = discovery_color
                     self.arena.update_target_commitment( discovery_target, 1 )
-                    self.decision_made = True
+                    self.decision_made_Targ = True
                     # save info about decision for every neighbor agent
                     # for agent_neigh in neighbours:
                     #     agent_neigh.step_neighbours = self
                         # print agent_neigh.step_neighbours.target_color
                     # erase info about neighboring decision once a decision is made
-                    self.step_neighbours = None
+                    # self.step_neighbours = None
+                    self.step_target = None # reset info
                 elif rand_number < discovery_value + recruitment_value:
                     self.target_committed = recruitment_target
                     self.target_value     = recruitment_value/TimeScaling
                     self.target_color     = recruitment_color
-                    # self.step_neighbours  = [] # reset list of neighbors after decision
+                    self.step_neighbours  = None # reset list of neighbors after decision
                     self.arena.update_target_commitment( recruitment_target, 1 );
-                    self.decision_made = True
+                    self.decision_made_Neigh = True
                     # save info about decision for every neighbor agent
                     # for agent_neigh in neighbours:
                     #     agent_neigh.step_neighbours = self
                         # print agent_neigh.step_neighbours.target_color
                     # erase info about neighboring decision once a decision is made
                     self.step_neighbours = None
-                else: self.decision_made = False
+                else: self.decision_made_Neigh = False
 
             else:
                 # Abandonment
@@ -262,13 +267,14 @@ class CRWLEVYAgent(pysage.Agent):
                     print "[ERROR] Probabilities go over maximimum value"
                     sys.exit(2)
 
+                self.decision_made_Neigh = False
                 if random.uniform(0,1) < prob_abandonment + prob_crossinhibition:
                     self.arena.update_target_commitment( self.target_committed, -1 );
                     self.target_committed = None
                     self.target_value     = 0
-                    # self.step_neighbours  = [] # reset list of neighbors when decision made
                     self.target_color     = "black"
-                    self.decision_made = True
+                    self.step_neighbours  = None # reset list of neighbors when decision made
+                    self.decision_made_Neigh = True
 
 
 
@@ -291,6 +297,23 @@ class CRWLEVYAgent(pysage.Agent):
 
             self.apply_velocity.rotate(crw_angle)
 
+
+        # check during each time step if the agent is at a target. If yes, save
+        # target information to be used during N step for decision when agent
+        # might not be under a target anymore
+        for t in self.arena.targets:
+            if (t.position - self.position).get_length() < t.size and self.decision_made_Targ == False:
+                # print 'Agent is under a target. Saved info.'
+                self.step_target = t
+                break
+
+        # check all neighbors every time step to save their info for later processing
+        # in case no neighbors are located at N step when decision is made
+        step_neighbours = self.arena.get_neighbour_agents(self, CRWLEVYAgent.interaction_range)
+        # if any neighbors available, save to the agent data
+        if step_neighbours and self.decision_made_Neigh == False:
+            self.step_neighbours = step_neighbours
+            # print 'saved neighbors'
 
 
 

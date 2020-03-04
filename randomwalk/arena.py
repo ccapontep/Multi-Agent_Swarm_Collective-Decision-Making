@@ -35,6 +35,8 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
 
         self.time_scale = 0.008 if config_element.attrib.get("time_scale") is None else float(config_element.attrib.get("time_scale"))
 
+        self.time_scale = 100 if config_element.attrib.get("time_decision_stepcale") is None else int(config_element.attrib.get("decision_step"))
+
         self.size_radius = 0.7506 if config_element.attrib.get("size_radius") is None else float(config_element.attrib.get("size_radius"))
 
         self.steps_run = int(config_element.attrib["steps_run"])
