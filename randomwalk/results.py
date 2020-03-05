@@ -12,7 +12,7 @@ class Results:
     def __init__( self, config_element ):
 
         self.num_runs = int(config_element.attrib["num_runs"])
-        self.steps_run = int(config_element.attrib["steps_run"])
+        self.max_steps = int(config_element.attrib["max_steps"])
 
         self.has_converged = []
         self.convergence_time = []
@@ -45,13 +45,14 @@ class Results:
 
         print(all_data)
 
-        head = 'Run Number  |  Time to Converge  |  Agents Commited to First / Second / Uncommitted Target\n'
+        head = 'Run Number  |  Time to Converge  |  Agents Commited to First / Second / Neither Target\n'
         with open(data_filename, "a+") as f:
             if self.start == True:
                 f.write(head)
                 f.write('\t'.join(str(data) for data in all_data))
                 f.write('\n')
-            elif save_num != self.steps_run and save_num != 1:
+            # elif save_num != self.steps_run and save_num != 1:
+            elif save_num != self.max_steps and save_num != 1:
                 f.write('\t'.join(str(data) for data in all_data))
                 f.write('\n')
             else:

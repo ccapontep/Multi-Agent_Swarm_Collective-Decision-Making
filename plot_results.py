@@ -12,7 +12,7 @@ results_path = os.path.join(directory, "results")
 plot_path = os.path.join(results_path, "plots")
 
 # all_files = [idx for idx in os.listdir(results_path) if idx.endswith('QltyValue_4.5_targetDis_0.76_CRW_0.3.txt')]
-all_files = [idx for idx in os.listdir(results_path) if idx.endswith('QltyValue_5.0_targetDis_0.76_CRW_0.0_levy_2.0.txt')]
+all_files = [idx for idx in os.listdir(results_path) if idx.endswith('.txt')]
 time_incr = 2
 
 for file in all_files:
@@ -24,7 +24,7 @@ for file in all_files:
         QtyCommitTarWon = []
         QtyCommitTarLoss = []
         QtyUncommit = []
-        times = list(range(1,16)) * time_incr
+        times = list(range(0,31, time_incr))[1:]
 
         lines = f.readlines()
         lines = lines[1:]

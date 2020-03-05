@@ -35,11 +35,11 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
 
         self.time_scale = 0.008 if config_element.attrib.get("time_scale") is None else float(config_element.attrib.get("time_scale"))
 
-        self.time_scale = 100 if config_element.attrib.get("time_decision_stepcale") is None else int(config_element.attrib.get("decision_step"))
+        self.decision_step = 100 if config_element.attrib.get("decision_step") is None else int(config_element.attrib.get("decision_step"))
 
         self.size_radius = 0.7506 if config_element.attrib.get("size_radius") is None else float(config_element.attrib.get("size_radius"))
 
-        self.steps_run = int(config_element.attrib["steps_run"])
+        # self.steps_run = int(config_element.attrib["steps_run"])
         self.time_incr = float(config_element.attrib["time_incr"])
 
         # is the experiment finished?
@@ -182,14 +182,14 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
         # apply the desired motion
         for a in self.agents:
             a.update()
-            if a.position.get_distance((0,0)) > (self.dimensions_radius- a.size):
+            if a.position.get_distance((0,0)) > (self.dimensions_radius- a.size/2):
                 current_angle = a.position.get_angle()
-                a.position = pysage.Vec2d(self.dimensions_radius- a.size, 0)
+                a.position = pysage.Vec2d(self.dimensions_radius- a.size/2, 0)
                 a.position.rotate(current_angle)
 
 
         # check convergence
-        if self.check_quorum_reached():
+        if self.check_quorum_reached() and not self.has_converged:
             self.has_converged = True
             self.convergence_time = self.num_steps
 
@@ -253,23 +253,24 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
 
         # conv_time = 0.0
 
-        if ((self.max_steps > 0) and (self.max_steps <= self.num_steps) or self.has_converged or self.save_num == self.steps_run):
+        if (self.max_steps > 0) and (self.max_steps <= self.num_steps): # or self.has_converged or self.save_num == self.steps_run):
             # conv_time =  self.convergence_time
             print "Run finished: ", self.has_converged, "\tTotal seconds:", self.convergence_time
 
             commitment_state = self.get_commitment_state()
             # self.results.store(self.has_converged, self.convergence_time, commitment_state, True)
 
-            while self.save_num != self.steps_run and self.save_num < self.steps_run:
-                self.save_num += 1
-                fake_time = (self.save_num -1) * self.time_incr * 60
-                self.results.store(self.has_converged, fake_time, commitment_state, False)
-                self.results.save(results_filename, self.save_num)
+            # while self.save_num != self.steps_run and self.save_num < self.steps_run:
+            #     self.save_num += 1
+            #     fake_time = (self.save_num -1) * self.time_incr * 60
+            #     self.results.store(self.has_converged, fake_time, commitment_state, False)
+            #     self.results.save(results_filename, self.save_num)
 
 
             self.save_num += 1
-            fake_time = (self.save_num-1) * self.time_incr * 60
-            self.results.store(self.has_converged, fake_time, commitment_state, True)
+            # fake_time = (self.save_num-1) * self.time_incr * 60
+            # self.results.store(self.has_converged, fake_time, commitment_state, True)
+            self.results.store(self.has_converged, self.num_steps, commitment_state, True)
             self.results.save(results_filename, self.save_num)
             self.save_num = 0 # reset counter
             return True

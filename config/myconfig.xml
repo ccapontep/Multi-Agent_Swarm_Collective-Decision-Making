@@ -8,11 +8,10 @@
         decision_step = "100"
         size="1.6,1.6"
         size_radius= "0.7506"
-        max_steps="100000"
+        max_steps="2400"
         num_agents="150"
         num_runs="100"
-        steps_run="40"
-        time_incr='1.7'
+        time_incr='2'
         results="result_test.dat"
         decision_quorum="0.70"
         >

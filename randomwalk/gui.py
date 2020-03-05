@@ -22,13 +22,20 @@ class CRWLEVYgui(pysage.PysageGUI):
     # GUI intialize function: stup the tk environemt
     def initialize(self):
         pysage.PysageGUI.initialize(self)
+        radius = self.arena.dimensions_radius*self.pixels_per_meter
+        xpos = self.arena.dimensions.x/2.0*self.pixels_per_meter
+        ypos = self.arena.dimensions.y/2.0*self.pixels_per_meter
+        # print xpos, ypos
+        self.w.create_oval((xpos-radius,ypos-radius,xpos+radius,ypos+radius), outline="black", width=5)
+
+
         for i in range(self.arena.num_targets):
             t = self.arena.targets[i]
             xpos = int((t.position.x+self.arena.dimensions.x/2.0)*self.pixels_per_meter)
             ypos = int((t.position.y+self.arena.dimensions.y/2.0)*self.pixels_per_meter)
             target_halfsize = int(t.size*self.pixels_per_meter)
             target_tag = "target_%d" % i #allora forse identity non serve visto che c'è già il tag
-            self.targets_id.append(self.w.create_oval((xpos-target_halfsize,ypos-target_halfsize,xpos+target_halfsize,ypos+target_halfsize), fill= t.color, stipple='gray50', tags=(target_tag)))
+            self.targets_id.append(self.w.create_oval((xpos-target_halfsize,ypos-target_halfsize,xpos+target_halfsize,ypos+target_halfsize), outline= t.color, width=5, stipple='gray50', tags=(target_tag)))
             self.w.tag_bind(target_tag, "<ButtonPress-1>", lambda event, target_tag = target_tag: self.target_selected(event, target_tag))
 
 
