@@ -4,25 +4,25 @@
     <arena
         pkg="randomwalk"
         timestep_length="0.1"
-        time_scale = "0.01"
-        decision_step = "100"
+        time_scale = "0.1"
+        decision_step = "10"
         size="1.6,1.6"
         size_radius= "0.7506"
-        max_steps="2400"
+        max_steps="1800"
         num_agents="150"
         num_runs="100"
-        time_incr='2'
+        time_incr="2"
         results="result_test.dat"
         decision_quorum="0.70"
         >
-      <target id="A" value="5" size="0.136" color="green" distance="0.76" />
-      <target id="B" value="5" size="0.136" color="purple" distance="0.76" />
+      <target id="A" value="2" size="0.136" color="green" distance="1.22" />
+      <target id="B" value="2" size="0.136" color="purple" distance="1.22" />
       <agent pkg="randomwalk"
              size='0.033'
-             linear_speed="0.01"
-             CRW_exponent="0.6"
+             linear_speed="0.1"
+             CRW_exponent="0"
              average_motion_steps="0"
-             std_motion_steps="100"
+             std_motion_steps="10"
              levy_exponent="2"
              interaction_range="0.1"
              bias_probability ="0.1" />

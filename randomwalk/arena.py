@@ -91,13 +91,9 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
             # half the target distance
             while on_target:
                 if i == 0:
-                    # max_size = (self.dimensions_radius - target.size)
                     max_size = target.distance /2
-                    # print max_size
                     while True:
                         x1 = random.uniform(-max_size, max_size)
-                        # rand2 = random.uniform(-max_size, max_size)
-                        # d1 = math.sqrt((rand1 - 0)**2 + (rand2 - 0)**2)
                         negpos = random.choice((-1, 1))
                         y1 = math.sqrt(max_size**2 - x1**2) * negpos
                         if math.sqrt(x1**2 + y1**2) == max_size:
@@ -108,14 +104,10 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
             # Get the location of the second target random, but set length away
             # from first target and inside circle area environment
                 else:
-                    # target.position = pysage.Vec2d(0,0)
                     while True:
                         targetA_pos = self.targets[0].position
-                        # angle = random.uniform(0,360)
                         x = targetA_pos[0] * -1
                         y = targetA_pos[1] * -1
-                        # x = (target.distance * math.cos(angle)) + targetA_pos[0]
-                        # y = (target.distance * math.sin(angle)) + targetA_pos[1]
                         d2 = math.sqrt((x - 0)**2 + (y - 0)**2)
                         if d2 < max_size * 2:
                             target.position = pysage.Vec2d(x,y)
@@ -140,9 +132,7 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
                     d1 = math.sqrt((Arand1 - 0)**2 + (Arand2 - 0)**2)
                     if d1 < max_sizeA:
                         agent.position = pysage.Vec2d(Arand1,Arand2)
-                        # agent.position.rotate(random.uniform(-math.pi,math.pi))
                         break
-                # agent.position = pysage.Vec2d(random.uniform(0,max_size),0)
                 on_target= False
                 for t in self.targets:
                     if (t.position - agent.position).get_length() < t.size:
@@ -167,8 +157,6 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
                 self.results.store(self.has_converged, self.num_steps, commitment_state, False)
                 self.results.save(results_filename, self.save_num)
             self.update()
-        # if self.save_num == self.steps_run -1:
-        #     self.experiment_finished()
 
     ##########################################################################
     # updates the status of the simulation
@@ -250,26 +238,12 @@ class CRWLEVYArena(pysage.Arena): #quindi è una sottoclasse della classe Arena 
     def experiment_finished( self ):
         results_filename = os.path.join(directory, "results", "QltyValue_" + str(self.targets[0].value) + '_targetDis_' + str(self.targets[0].distance) + '_CRW_' + str(CRWLEVYAgent.CRW_exponent) + '_levy_' + str(CRWLEVYAgent.levy_exponent) +  '.txt')
 
-
-        # conv_time = 0.0
-
         if (self.max_steps > 0) and (self.max_steps <= self.num_steps): # or self.has_converged or self.save_num == self.steps_run):
-            # conv_time =  self.convergence_time
             print "Run finished: ", self.has_converged, "\tTotal seconds:", self.convergence_time
 
             commitment_state = self.get_commitment_state()
-            # self.results.store(self.has_converged, self.convergence_time, commitment_state, True)
-
-            # while self.save_num != self.steps_run and self.save_num < self.steps_run:
-            #     self.save_num += 1
-            #     fake_time = (self.save_num -1) * self.time_incr * 60
-            #     self.results.store(self.has_converged, fake_time, commitment_state, False)
-            #     self.results.save(results_filename, self.save_num)
-
 
             self.save_num += 1
-            # fake_time = (self.save_num-1) * self.time_incr * 60
-            # self.results.store(self.has_converged, fake_time, commitment_state, True)
             self.results.store(self.has_converged, self.num_steps, commitment_state, True)
             self.results.save(results_filename, self.save_num)
             self.save_num = 0 # reset counter
