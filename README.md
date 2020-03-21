@@ -20,3 +20,9 @@ cess to both simulate the spread of data and the disturbance of such through fou
 processes: discovery, recruitment, abandonment and cross-inhibition.
 
 ![](results/images/kilobot-simulation.png)
+![](results/images/simulation_q5_2mid.png)
+![](results/analysis/percent_levy.png)
+![](results/analysis/avgtime_distance.png)
+
+
+
