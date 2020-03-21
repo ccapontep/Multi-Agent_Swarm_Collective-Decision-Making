@@ -1297,8 +1297,8 @@ def start(argv):
     arena = ArenaFactory.create_arena(arena_config)
 
     gui_config = tree.getroot().find('gui')
-    if gui_config is None:
-    # if gui_config is not None: #original file - used for GUI
+    # if gui_config is None:
+    if gui_config is not None: #original file - used for GUI
         global tk
         import Tkinter as tk
         print 'Graphical user interface is on'

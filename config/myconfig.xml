@@ -15,8 +15,8 @@
         results="result_test.dat"
         decision_quorum="0.70"
         >
-      <target id="A" value="2" size="0.136" color="green" distance="1.22" />
-      <target id="B" value="2" size="0.136" color="purple" distance="1.22" />
+      <target id="A" value="5" size="0.136" color="green" distance="0.76" />
+      <target id="B" value="5" size="0.136" color="purple" distance="0.76" />
       <agent pkg="randomwalk"
              size='0.033'
              linear_speed="0.1"
