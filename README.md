@@ -1,5 +1,6 @@
 # Multi-Agent_Swarm_Collective-Decision-Making
 Multi-agent simulation environment for mobile agents (kilobots) to test decision making for swarm robots.
+See report pdf and ppt presentation for analysis and results.
 
 The goal of the study is understanding the effects of spatiality into a decision-making process in-
 spired by the honeybees nest-site selection behaviour. This problem consists in choosing between
@@ -23,6 +24,19 @@ processes: discovery, recruitment, abandonment and cross-inhibition.
 ![](results/images/simulation_q5_2mid.png)
 ![](results/analysis/percent_levy.png)
 ![](results/analysis/avgtime_distance.png)
+
+Conclusions:
+
+Analyzing all the results of the simulation experiments show that the best performance for both
+percentage of converged runs and average time to converge are using ν = 5 and as follows:
+• distance = 0.28
+• CRW = 0.6 and levy = 2
+For avoiding the worst performance, do not use ν = {1.5, 2} and the following parameters:
+• distance = 1.06 for percentage of runs converged
+• distance = 0.76 for average convergence time
+• CRW = 0.9 and levy = 1.2
+The lower the quality value, the worse the performance in both percentage of converged runs and
+average time to converge.
 
 
 
