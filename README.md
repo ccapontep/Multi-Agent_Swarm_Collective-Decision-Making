@@ -19,4 +19,4 @@ mentioned above. Likewise, kilobots and the simulated agents likewise use a deci
 cess to both simulate the spread of data and the disturbance of such through four decision-making
 processes: discovery, recruitment, abandonment and cross-inhibition.
 
-![](results/images/kilobot-simulation.png
+![](results/images/kilobot-simulation.png)
