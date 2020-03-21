@@ -29,12 +29,20 @@ Conclusions:
 
 Analyzing all the results of the simulation experiments show that the best performance for both
 percentage of converged runs and average time to converge are using ν = 5 and as follows:
+
 • distance = 0.28
+
 • CRW = 0.6 and levy = 2
+
+
 For avoiding the worst performance, do not use ν = {1.5, 2} and the following parameters:
+
 • distance = 1.06 for percentage of runs converged
+
 • distance = 0.76 for average convergence time
+
 • CRW = 0.9 and levy = 1.2
+
 The lower the quality value, the worse the performance in both percentage of converged runs and
 average time to converge.
 
