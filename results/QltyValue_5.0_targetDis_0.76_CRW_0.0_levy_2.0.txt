@@ -1599,3 +1599,10 @@ final	1800	32	97	21
 99	1560	106	25	19
 99	1680	110	21	19
 final	1800	104	27	19
+Run Number  |  Time to Converge  |  Agents Commited to First / Second / Neither Target
+0	0	0	0	150
+0	120	42	34	74
+Run Number  |  Time to Converge  |  Agents Commited to First / Second / Neither Target
+final	1800	40	88	22
+Run Number  |  Time to Converge  |  Agents Commited to First / Second / Neither Target
+final	1800	88	42	20
